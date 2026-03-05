@@ -4,7 +4,7 @@ const tr = {
   },
 
   paywall: {
-    title: "Pro’yu Aç",
+    title: "Profesyonel Risk Analizini Etkinleştir",
     subtitle: "Tek seferlik satın alma. İstediğin zaman geri yükle.",
     body: "Tam risk dökümü ve role özel yanıt seçeneklerini gör.",
     priceLine: "$9.99 • Ömür boyu erişim",
@@ -28,10 +28,23 @@ const tr = {
     subtitle:
       "İtibar, hiyerarşi ve güç dinamikleri için gelişmiş risk zekâsı — Gönder’e basmadan önce.",
     analyzeCta: "Mesajı analiz et",
-    unlockCta: "Pro’yu Aç",
-    priceNote: "Tek seferlik satın alma • Fair-use günde 5",
+   unlockCta: "Pro Erişimi Al",
+   priceNote: "Tek seferlik satın alma • Günlük 5 risk kontrolü",
     privacyTitle: "Önce gizlilik",
-    privacyNote: "Mesajın oturum içinde analiz edilir ve kaydedilmez.",
+   privacyNote: "Mesajınız oturum sırasında analiz edilir ve asla kaydedilmez veya saklanmaz.",
+    valueProposition:
+  "İtibarınızı koruyun ve iş yerindeki yanlış anlaşılmaları azaltın.",
+languageHint: "En tutarlı sonuçlar için şu anda İngilizce önerilir.",
+sampleRiskEyebrow: "Örnek Risk Raporu",
+sampleRiskTitle: "Risk Endeksi: Orta",
+sampleExampleOutput: "Örnek çıktı",
+sampleRiskLevel: "Risk seviyesi",
+navHowItWorks: "Nasıl çalışır",
+navRiskTypes: "Risk Türleri",
+navPricing: "Fiyatlandırma",
+navFaq: "SSS",
+navUnlockPro: "Pro Kilidini Aç",
+
   },
 
   results: {
@@ -42,11 +55,23 @@ const tr = {
     copy: "Kopyala",
     copied: "Panoya kopyalandı",
     copyFailed: "Kopyalama başarısız",
+contextMode: "Mod",
+contextRole: "Gönderen rolü",
+contextReceiver: "Alıcı rolü",
+contextCountry: "Ülke",
+contextLanguage: "Dil",
 
     tabsFinal: "Final",
     tabsRisks: "Riskler",
     tabsResponses: "Yanıtlar",
   },
+ 
+  riskDetails: {
+  title: "Risk detayları",
+  show: "Risk detaylarını görüntüle",
+  hide: "Risk detaylarını gizle",
+},
+
   states: {
   empty: {
     title: "Henüz analiz yok",

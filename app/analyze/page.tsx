@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getDictionary } from "../i18n/getDictionary";
 import { getLang } from "../i18n/getLang";
-
+import { useSearchParams } from "next/navigation";
 type CorporateStyle =
   | "US Corporate"
   | "German Directness"
@@ -22,12 +22,23 @@ export default function AnalyzePage() {
   const [role, setRole] = useState<RecipientRole>("Manager");
   const [behavior, setBehavior] = useState<RecipientBehavior>("Neutral");
   const [message, setMessage] = useState("");
-
+const searchParams = useSearchParams();
+const mode = searchParams.get("mode");
+const isLandingEntry = searchParams.get("entry") === "landing";
   const canAnalyze = useMemo(() => message.trim().length >= 8, [message]);
 const [loading, setLoading] = useState(false);
 const [error, setError] = useState<string | null>(null);
 const [dict, setDict] = useState<any | null>(null);
+const [isPro, setIsPro] = useState(false);
 
+useEffect(() => {
+  const sync = () => setIsPro(localStorage.getItem("lastword:premium") === "true");
+  sync();
+
+  const onChanged = () => sync();
+  window.addEventListener("lastword_premium_changed", onChanged);
+  return () => window.removeEventListener("lastword_premium_changed", onChanged);
+}, []);
 useEffect(() => {
   const locale = getLang();
  setDict(getDictionary(locale));
@@ -55,13 +66,13 @@ if (r.status === 429) {
     }
 
     const data = await r.json();
-sessionStorage.setItem("lastword:lastPayload", JSON.stringify(payload));
+sessionStorage.setItem("lastword:payload", JSON.stringify(payload));
 sessionStorage.setItem("lastword:lastResult", JSON.stringify(data));
 router.push("/results");
 
     // sonucu results sayfası için sakla
     sessionStorage.setItem("lastword:lastResult", JSON.stringify(data));
-    router.push("/results");
+    
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     setError(e?.message === "__RATE_LIMIT__" ? "__RATE_LIMIT__" : (e?.message ?? "Analyze failed"));
@@ -103,21 +114,25 @@ router.push("/results");
     <div className="text-sm font-semibold">
       {error === "__RATE_LIMIT__" ? dict.states.rateLimit.title : dict.states.error.title}
     </div>
-
+{error === "__RATE_LIMIT__" && isLandingEntry ? (
+  <div className="mt-2 text-xs text-white/60">
+    You can continue tomorrow, or unlock Pro for extended usage.
+  </div>
+) : null}
     <div className="mt-1 text-sm opacity-80">
       {error === "__RATE_LIMIT__" ? dict.states.rateLimit.body : dict.states.error.body}
     </div>
 
     <div className="mt-3 flex gap-2">
-      {error === "__RATE_LIMIT__" ? (
-        <button
-          type="button"
-          onClick={() => router.push("/paywall")}
-          className="rounded-xl bg-black px-3 py-2 text-sm font-medium text-white"
-        >
-          {dict.states.rateLimit.cta}
-        </button>
-      ) : null}
+      {error === "__RATE_LIMIT__" && !isLandingEntry ? (
+  <button
+    type="button"
+    onClick={() => router.push("/paywall")}
+    className="rounded-xl bg-black px-3 py-2 text-sm font-medium text-white"
+  >
+    {dict.states.rateLimit.cta}
+  </button>
+) : null}
 
       <button
         type="button"
@@ -136,7 +151,7 @@ router.push("/results");
 
         <Field label="Corporate Communication Style">
           <select
-            className="w-full rounded-xl border px-3 py-2 text-sm bg-transparent"
+            className="w-full rounded-xl border px-3 py-2 text-sm bg-black text-white"
             value={style}
             onChange={(e) => setStyle(e.target.value as CorporateStyle)}
           >
@@ -149,12 +164,16 @@ router.push("/results");
           <div className="mt-2 text-xs opacity-70">
             A communication lens for risk interpretation — not nationality.
           </div>
+          <div className="mt-1 text-[11px] text-white/50">
+  {dict?.home?.languageHint ?? ""}
+</div>
+
         </Field>
 
         <div className="grid grid-cols-2 gap-3">
           <Field label="Recipient role">
             <select
-              className="w-full rounded-xl border px-3 py-2 text-sm bg-transparent"
+              className="w-full rounded-xl border px-3 py-2 text-sm bg-black text-white"
               value={role}
               onChange={(e) => setRole(e.target.value as RecipientRole)}
             >
@@ -168,7 +187,7 @@ router.push("/results");
 
           <Field label="Recipient behavior">
             <select
-              className="w-full rounded-xl border px-3 py-2 text-sm bg-transparent"
+              className="w-full rounded-xl border px-3 py-2 text-sm bg-black text-white"
               value={behavior}
               onChange={(e) =>
                 setBehavior(e.target.value as RecipientBehavior)
@@ -177,7 +196,7 @@ router.push("/results");
               <option>Neutral</option>
               <option>Passive</option>
               <option>Aggressive</option>
-              <option>Ghosting</option>
+             <option>Non-Responsive</option>
             </select>
           </Field>
         </div>
@@ -188,7 +207,11 @@ router.push("/results");
           <div className="text-sm font-medium">Message</div>
           <div className="text-xs opacity-60">Professional only</div>
         </div>
-
+{!isPro && (
+  <div className="mb-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/80">
+    ⚡ Free analysis — 1 final message available. Unlock Pro to see full risk analysis and responses.
+  </div>
+)}
         <textarea
           className="w-full min-h-[170px] rounded-xl border px-3 py-2 text-sm bg-transparent"
           placeholder="Paste the email / Slack message you’re about to send…"

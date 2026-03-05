@@ -1,10 +1,16 @@
-export type SupportedLang = "en" | "tr" | "fr" | "es";
+// app/i18n/getLang.ts
 
-export function normalizeLang(input?: string | null): SupportedLang {
-  const v = (input || "").toLowerCase().trim();
-  if (v === "tr" || v === "fr" || v === "es" || v === "en") return v;
+export type SupportedLang = "en";
+
+export function normalizeLang(_input: string | null): SupportedLang {
   return "en";
 }
+
 export function getLang(): SupportedLang {
   return "en";
+}
+
+export function setLang(_lang: SupportedLang) {
+  // English-only: no-op (intentionally)
+  // Dil değişimini tamamen etkisiz bırakıyoruz ki UI/layout bozulmasın.
 }

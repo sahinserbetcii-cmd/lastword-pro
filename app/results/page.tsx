@@ -1,8 +1,10 @@
 
 "use client";
+export const dynamic = "force-dynamic";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 import { getDictionary } from "../i18n/getDictionary";
 import { normalizeLang } from "../i18n/getLang";
@@ -69,15 +71,50 @@ async function copyToClipboard(text: string) {
     }
   }
 }
+function getPrimaryRiskLabel(score?: number | null) {
+  const s = typeof score === "number" ? score : NaN;
 
-export default function ResultsPage() {
+  if (!Number.isFinite(s)) return "—";
+
+  if (s >= 80) return "Escalation Risk";
+  if (s >= 65) return "Authority Conflict Risk";
+  if (s >= 50) return "Relational Strain Risk";
+  return "Low Professional Risk";
+}
+
+function ResultsInner() {
+
   const router = useRouter();
 
-  const locale = normalizeLang(
-    typeof window !== "undefined"
-      ? new URLSearchParams(window.location.search).get("lang")
-      : "en"
+  const searchParams = useSearchParams();
+const locale = normalizeLang(searchParams.get("lang") ?? "en");
+const payloadRaw =
+  typeof window !== "undefined"
+    ? sessionStorage.getItem("lastword:payload")
+    : null;
+if (!payloadRaw) {
+  return (
+    <main suppressHydrationWarning className="min-h-screen bg-black text-white flex items-center justify-center px-6">
+      <div className="max-w-md w-full rounded-2xl border border-white/10 bg-white/5 p-6">
+        <div className="text-lg font-semibold">No analysis yet</div>
+        <div className="mt-2 text-sm text-white/70">
+          Please run an analysis first. We’ll take you back to Analyze.
+        </div>
+        <button
+          className="mt-4 w-full rounded-xl bg-white text-black py-2 text-sm font-medium"
+          onClick={() => router.push("/analyze")}
+        >
+          Go to Analyze
+        </button>
+      </div>
+    </main>
   );
+}
+useEffect(() => {
+  if (!payloadRaw) {
+    router.replace("/analyze");
+  }
+}, [payloadRaw, router]);
 
   function goPaywall() {
     router.push(`/paywall?lang=${locale}`);
@@ -90,26 +127,33 @@ export default function ResultsPage() {
   const [payload, setPayload] = useState<ProPayload | null>(null);
   const [result, setResult] = useState<unknown | null>(null);
   const [api, setApi] = useState<ApiState>({ status: "idle" });
+  const doneData = api.status === "done" && "data" in api ? api.data : null;
   const data = api.status === "done" ? api.data : null;
   const [activeTab, setActiveTab] = useState<"final" | "risks" | "responses">(
     "final"
   );
+const [showRiskDetails, setShowRiskDetails] = useState(false);
 
-  const isPro = useMemo(() => {
-    if (typeof window === "undefined") return false;
-    const v =
-      localStorage.getItem("lastword:premium") ||
-      localStorage.getItem("lastword:unlocked") ||
-      localStorage.getItem("premium") ||
-      localStorage.getItem("unlocked");
-    return v === "1" || v === "true" || v === "yes";
-  }, []);
+ const [isPro, setIsPro] = useState(false);
+ const [toast, setToast] = useState<{ type: "success" | "info"; text: string } | null>(null);
+useEffect(() => {
+  const sync = () => {
+    const v = localStorage.getItem("lastword:premium");
+    setIsPro(v === "true");
+  };
 
-  const [toast, setToast] = useState<string | null>(null);
-  function showToast(msg: string) {
-    setToast(msg);
-    window.setTimeout(() => setToast(null), 1600);
-  }
+  sync();
+
+  const onChanged = () => sync();
+  window.addEventListener("lastword_premium_changed", onChanged);
+
+  return () => {
+    window.removeEventListener("lastword_premium_changed", onChanged);
+  };
+}, []);
+
+
+  
 
   // 1) Mount gate
   useEffect(() => {
@@ -144,12 +188,12 @@ export default function ResultsPage() {
     const rows: Array<[string, string]> = [];
     if (!p) return rows;
 
-    if (p.mode) rows.push([dict.results.contextMode, String(p.mode)]);
-    if (p.role) rows.push([dict.results.contextRole, String(p.role)]);
+    rows.push(["Mode", String(p.mode)]);
+    if (p.role) rows.push(["Role", String(p.role)]);
     if (p.receiverRole)
-      rows.push([dict.results.contextReceiver, String(p.receiverRole)]);
-    if (p.country) rows.push([dict.results.contextCountry, String(p.country)]);
-    if (p.language) rows.push([dict.results.contextLanguage, String(p.language)]);
+      rows.push(["Receiver", String(p.receiverRole)]);
+    if (p.country) rows.push(["Country", String(p.country)]);
+    // if (p.language) rows.push(["Language", String(p.language)]);
 
     return rows;
   }, [payload, dict]);
@@ -285,13 +329,17 @@ export default function ResultsPage() {
       {/* Done state */}
       {api.status === "done" && api.data && (
         <div className="space-y-5">
+          
           {/* Tabs */}
           <div className="mb-6 flex gap-6 border-b border-white/10 sticky top-0 z-20 bg-black/70 backdrop-blur">
-            {[
-              { key: "final", label: dict.results.tabsFinal },
-              { key: "risks", label: dict.results.tabsRisks },
-              { key: "responses", label: dict.results.tabsResponses },
-            ].map((tab) => (
+           {(isPro
+  ? [
+      { key: "final", label: dict.results.tabsFinal },
+      { key: "risks", label: dict.results.tabsRisks },
+      { key: "responses", label: dict.results.tabsResponses },
+    ]
+  : [{ key: "final", label: dict.results.tabsFinal }]
+).map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key as any)}
@@ -310,21 +358,58 @@ export default function ResultsPage() {
           </div>
 
           {/* Risk score */}
-          {activeTab === "final" && (
-            <section className="rounded-2xl border border-white/10 p-5">
-              <div className="text-sm opacity-70">Risk Score</div>
-              <div className="mt-2 flex items-baseline gap-3">
-                <div className="text-5xl font-semibold">
-                  {api.data.riskScore ?? "—"}
-                </div>
-                <div className="text-sm opacity-60">/ 100</div>
-              </div>
-            </section>
-          )}
+{activeTab === "final" && (
+  <section className="rounded-2xl border border-white/10 p-5">
+    <div className="text-sm opacity-70">Risk Score</div>
+
+    <div className="mt-2 flex items-baseline gap-3">
+      <div className="text-5xl font-semibold">
+        {api.data.riskScore ?? "—"}
+      </div>
+      <div className="text-sm opacity-60">/ 100</div>
+    </div>
+
+   <div className="mt-4 text-xs text-white/70">
+      <span className="mr-2 uppercase tracking-wide">Primary Risk</span>
+      <span className="opacity-90">
+        {getPrimaryRiskLabel(api.data.riskScore)}
+      </span>
+    </div>
+    <button
+  type="button"
+  onClick={() => setShowRiskDetails((v) => !v)}
+  className="mt-3 text-xs text-white/70 underline underline-offset-4 hover:text-white"
+>
+  {showRiskDetails ? "Hide risk details" : "View risk details"}
+</button>
+
+{showRiskDetails && (
+  <div className="mt-3 space-y-1 text-xs text-white/70">
+    <div>
+      <span className="mr-2 uppercase tracking-wide text-white/50">
+        Why it matters
+      </span>
+      <span>
+        Helps prevent escalation and protects professional credibility.
+      </span>
+    </div>
+    <div>
+      <span className="mr-2 uppercase tracking-wide text-white/50">
+        What to change
+      </span>
+      <span>
+        Reduce implied threats, add collaborative framing, and clarify next steps.
+      </span>
+    </div>
+  </div>
+)}
+  </section>
+)}
+
 
           {/* Risks */}
-          {activeTab === "risks" && (
-            <section className="rounded-2xl border border-white/10 p-5">
+          {isPro && activeTab === "risks" && (
+            <section className="rounded-2xl border border-white/10 p-5 relative">
               <div className="text-sm font-medium">Detected Risks</div>
               <div className="mt-4 space-y-3">
                 {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
@@ -365,6 +450,7 @@ export default function ResultsPage() {
                   </div>
                 )}
               </div>
+              
             </section>
           )}
 
@@ -373,7 +459,10 @@ export default function ResultsPage() {
             <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
               <div className="text-sm font-medium">Final Messages</div>
               <div className="mt-4 space-y-3">
-                {(api.data.finalMessages ?? []).map(
+                {(isPro
+  ? (api.data.finalMessages ?? [])
+  : (api.data.finalMessages ?? []).slice(0, 1)
+).map(
                   (m: unknown, index: number) => {
                     const item = asFinalMessageItem(m);
 
@@ -392,11 +481,7 @@ export default function ResultsPage() {
                               const ok = await copyToClipboard(
                                 item.message ?? ""
                               );
-                              showToast(
-                                ok
-                                  ? dict.results.copied
-                                  : dict.results.copyFailed
-                              );
+                              
                             }}
                             className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/80 hover:bg-white hover:text-black transition"
                           >
@@ -420,6 +505,11 @@ export default function ResultsPage() {
                         )}
                       </div>
                     );
+                 {!isPro && (doneData?.finalMessages?.length ?? 0) > 0 && (
+  <div className="mt-6 rounded-xl border border-white/10 bg-black/30 p-4 text-sm opacity-80">
+    Unlock Pro to view full risk analysis, additional final messages, and suggested responses.
+  </div>
+)}
                   }
                 )}
 
@@ -437,48 +527,31 @@ export default function ResultsPage() {
             </section>
           )}
 
-          {/* Potential responses */}
-          {activeTab === "responses" && (
-            <section className="relative rounded-2xl border border-white/10 bg-white/5 p-5">
-              {!isPro && (
-                <div
-                  role="button"
-                  tabIndex={0}
-                  onClick={goPaywall}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") goPaywall();
-                  }}
-                  className="absolute inset-0 z-10 cursor-pointer rounded-2xl"
-                  aria-label="Unlock Pro"
-                />
-              )}
+         {/* Potential responses */}
+{isPro && activeTab === "responses" && (
+  <section className="relative rounded-2xl border border-white/10 bg-white/5 p-5">
+    <div className="text-sm font-medium">Potential Responses</div>
 
-              <div className={isPro ? "" : "blur-sm pointer-events-none select-none"}>
-                <div className="text-sm font-medium">Potential Responses</div>
+    <div className="mt-4 space-y-3">
+      {((api as any)?.data?.potentialResponses ?? []).map((p: any, i: number) => (
+        <div
+          key={String(p?.id ?? p?.title ?? i)}
+          className="rounded-xl border border-white/10 p-4"
+        >
+          <div className="font-medium">{p?.title ?? "—"}</div>
 
-                <div className="mt-4 space-y-3">
-                  {((api as any)?.data?.potentialResponses ?? []).map(
-                    (p: any, i: number) => (
-                      <div
-                        key={String(p?.id ?? p?.title ?? i)}
-                        className="rounded-xl border border-white/10 p-4"
-                      >
-                        <div className="font-medium">{p?.title ?? "—"}</div>
-
-                        {!!p?.bullets?.length && (
-                          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm opacity-90">
-                            {p.bullets.map((b: string, bi: number) => (
-                              <li key={bi}>{b}</li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
-            </section>
+          {!!p?.bullets?.length && (
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm opacity-90">
+              {p.bullets.map((b: string, bi: number) => (
+                <li key={bi}>{b}</li>
+              ))}
+            </ul>
           )}
+        </div>
+      ))}
+    </div>
+  </section>
+)}
 
           {/* Actions */}
           <div className="flex gap-3">
@@ -504,5 +577,12 @@ export default function ResultsPage() {
         </div>
       )}  
     </main>
+  );
+}
+export default function ResultsPage() {
+  return (
+    <Suspense fallback={null}>
+      <ResultsInner />
+    </Suspense>
   );
 }

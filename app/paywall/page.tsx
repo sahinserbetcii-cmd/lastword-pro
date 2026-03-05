@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { paywallCopy } from "../i18n/paywall";
 import { normalizeLang } from "../i18n/getLang";
-
+import { setLang } from "../i18n/getLang";
 export default function PaywallPage() {
   return (
     <Suspense fallback={null}>
@@ -22,18 +22,38 @@ function PaywallContent() {
   const copy = paywallCopy[lang];
 
   function handleUnlock() {
-    // mevcut results sayfanın kontrol ettiği anahtarlar
-    localStorage.setItem("lastword:unlocked", "1");
-    localStorage.setItem("unlocked", "1");
+  // ✅ Results sayfanın kontrol ettiği anahtar
+  localStorage.setItem("lastword:premium", "true");
 
-    router.push("/analyze");
-  }
+  // ✅ ResultsInner useEffect'in dinlediği event
+  window.dispatchEvent(new Event("lastword_premium_changed"));
+
+  // ✅ kullanıcıya bildirim
+  localStorage.setItem(
+  "lastword:toast",
+  JSON.stringify({ type: "success", text: "Pro unlocked. Full results are now available." })
+);
+
+  // ✅ direkt sonuçlara dön (unlock etkisini görsün)
+  router.push("/results");
+}
 
   function handleRestore() {
     // şimdilik aynı davranış (gerçek restore StoreKit/RevenueCat ile gelecek)
     handleUnlock();
   }
+function handleContinueFree() {
+  // Free mod
+  localStorage.removeItem("lastword:premium");
+  window.dispatchEvent(new Event("lastword_premium_changed"));
 
+  localStorage.setItem(
+  "lastword:toast",
+  JSON.stringify({ type: "info", text: "Free mode: you’ll see 1 Final Message only. Upgrade to Pro to unlock Risks, Responses, and additional Final Messages." })
+);
+
+  router.push("/analyze");
+}
   return (
     <main
       style={{
@@ -47,12 +67,12 @@ function PaywallContent() {
       <section
         style={{
           width: "100%",
-          maxWidth: 420,
-          borderRadius: 24,
+          maxWidth: 1200,
+          borderRadius: 12,
           border: "1px solid rgba(255,255,255,0.10)",
           background:
             "radial-gradient(1200px 500px at 20% -10%, rgba(255,255,255,0.10), transparent 60%), rgba(255,255,255,0.03)",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.45)",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.35)",
           overflow: "hidden",
         }}
       >
@@ -101,10 +121,12 @@ function PaywallContent() {
                 <div style={{ marginBottom: 6, opacity: 0.8 }}>
                   {copy.labelLanguage}
                 </div>
-                <Link href="/paywall?lang=en">EN</Link>{" "}
-                <Link href="/paywall?lang=tr">TR</Link>{" "}
-                <Link href="/paywall?lang=fr">FR</Link>{" "}
-                <Link href="/paywall?lang=es">ES</Link>
+                <Link href="/paywall?lang=en" onClick={() => setLang("en")}>EN</Link>{" "}
+{/*
+<Link href="/paywall?lang=tr" onClick={() => setLang("tr")}>TR</Link>{" "}
+<Link href="/paywall?lang=fr" onClick={() => setLang("fr")}>FR</Link>{" "}
+<Link href="/paywall?lang=es" onClick={() => setLang("es")}>ES</Link>
+*/}
               </div>
             </div>
 
@@ -190,8 +212,8 @@ function PaywallContent() {
             </button>
 
             <button
-              type="button"
-              onClick={() => router.push("/analyze")}
+  type="button"
+  onClick={handleContinueFree}
               style={{
                 padding: "14px 14px",
                 borderRadius: 16,

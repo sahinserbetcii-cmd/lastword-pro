@@ -1,6 +1,6 @@
 export const paywallCopy = {
   en: {
-    title: "Unlock Pro",
+    title: "Unlock Professional Risk Analysis",
     subtitle: "One-time purchase. Professional-grade message risk analysis.",
     bullets: [
       "Daily fair-use: 5 analyses per day",
@@ -21,7 +21,7 @@ labelPrivacy: "Privacy",
   },
 
   tr: {
-    title: "Pro’yu Aç",
+    title: "Profesyonel Risk Analizini Etkinleştir",
     subtitle: "Tek seferlik satın alma. Profesyonel seviye mesaj risk analizi.",
     bullets: [
       "Günlük adil kullanım: günde 5 analiz",
@@ -42,7 +42,7 @@ labelPrivacy: "Gizlilik",
   },
 
   fr: {
-    title: "Débloquer Pro",
+    title: "Activer l’Analyse de Risque Professionnelle",
     subtitle: "Achat unique. Analyse de risque de message de niveau professionnel.",
     bullets: [
       "Usage raisonnable : 5 analyses par jour",
@@ -63,7 +63,7 @@ labelPrivacy: "Confidentialité",
   },
 
   es: {
-    title: "Desbloquear Pro",
+    title: "Activar Análisis Profesional de Riesgo",
     subtitle: "Compra única. Análisis de riesgo de mensajes a nivel profesional.",
     bullets: [
       "Uso razonable: 5 análisis por día",

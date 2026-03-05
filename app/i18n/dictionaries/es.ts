@@ -4,7 +4,7 @@ const es = {
   },
 
   paywall: {
-    title: "Desbloquear Pro",
+    title: "Activar Análisis Profesional de Riesgo",
     subtitle:"Compra única. Restáuralo cuando quieras.",
     body: "Ver el desglose completo de riesgos y respuestas según el rol.",
     priceLine: "$9.99 • Acceso de por vida",
@@ -28,10 +28,23 @@ note: "Puedes seguir en Gratis (límite diario).",
     subtitle:
       "Inteligencia de riesgos avanzada para reputación, jerarquía y dinámicas de poder — antes de presionar Enviar.",
     analyzeCta: "Analizar un mensaje",
-    unlockCta: "Desbloquear Pro",
-    priceNote: "Pago único • Fair-use 5/día",
+   unlockCta: "Obtener acceso Pro",
+    priceNote: "Compra única • 5 verificaciones de riesgo/día",
     privacyTitle: "Privacidad primero",
-    privacyNote: "Tu mensaje se analiza en sesión y no se almacena.",
+   privacyNote: "Tu mensaje se analiza durante la sesión y nunca se guarda ni se conserva.",
+    valueProposition:
+  "Protege tu reputación y reduce los malentendidos laborales.",
+languageHint: "Para obtener resultados más consistentes, actualmente se recomienda el inglés.",
+sampleRiskEyebrow: "Ejemplo de informe de riesgo",
+sampleRiskTitle: "Índice de riesgo: Medio",
+sampleExampleOutput: "Salida de ejemplo",
+sampleRiskLevel: "Nivel de riesgo",
+navHowItWorks: "Cómo funciona",
+navRiskTypes: "Tipos de riesgo",
+navPricing: "Precios",
+navFaq: "Preguntas frecuentes",
+navUnlockPro: "Desbloquear Pro",
+
   },
 
   results: {
@@ -52,6 +65,13 @@ contextLanguage: "Idioma",
     tabsRisks: "Riesgos",
     tabsResponses: "Respuestas",
   },
+ 
+ riskDetails: {
+  title: "Detalles del riesgo",
+  show: "Ver detalles del riesgo",
+  hide: "Ocultar detalles del riesgo",
+},
+
   states: {
   empty: {
     title: "Aún no hay análisis",
