@@ -17,25 +17,18 @@ export default function RefundPage() {
       </p>
 
       <p style={{ marginBottom: 22, fontSize: 17 }}>
-        LastWord Pro offers a one-time purchase for professional access.
+        Customers may request a refund within 14 days of purchase by contacting
+        support@lastwordpro.com.
+      </p>
+
+      <p style={{ marginBottom: 22, fontSize: 17 }}>
+        Refunds are processed through Paddle in accordance with Paddle&apos;s refund policy.
       </p>
 
       <h2 style={{ fontSize: 22, fontWeight: 600, marginTop: 30, marginBottom: 10 }}>
-  Refund Eligibility
-</h2>
-<p style={{ marginBottom: 22, fontSize: 17 }}>
-  If you experience a technical issue or an accidental purchase, you may request
-  a refund within 7 days of purchase. Approved refunds will be processed through
-  our payment provider.
-</p>
-
-<h2 style={{ fontSize: 22, fontWeight: 600, marginTop: 30, marginBottom: 10 }}>
-  How to Request
-</h2>
-<p style={{ fontSize: 17 }}>
-  Please contact support@lastwordpro.com with your purchase details. If your
-  request is approved, the refund will be issued through Paddle.
-</p>
+        Contact
+      </h2>
+      <p style={{ fontSize: 17 }}>support@lastwordpro.com</p>
     </main>
   );
 }
