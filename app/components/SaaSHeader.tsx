@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 type NavItem = {
   label: string;
   href: string; // anchor or route
@@ -65,10 +65,10 @@ const [scrolled, setScrolled] = React.useState(false);
 }, []);
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
+  
 
   // Locale kaynağı: önce prop, yoksa query, yoksa "en"
-  const lang = locale || searchParams.get("lang") || "en";
+  const lang = locale || "en";
 
   function scrollToSection(id: string) {
     const el = document.getElementById(id);
