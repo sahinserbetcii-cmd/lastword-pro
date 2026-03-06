@@ -96,20 +96,21 @@ React.useEffect(() => {
   Controlled free evaluation
 </span>
   <div className="flex items-center gap-3">
-    <a
-      href={`/paywall?lang=${locale}`}
+  <a
+    href={`/paywall?lang=${locale}`}
+    className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm"
+  >
+    {dict.home.unlockCta}
+  </a>
 
-      className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold hover:bg-white/10"
-    >
-     {dict.home.unlockCta}
+  <span className="text-xs opacity-70">
+    {dict.home.priceNote}
+  </span>
+</div>
 
-    </a>
-
-    <span className="text-xs opacity-70">
-      {dict.home.priceNote}
-
-    </span>
-  </div>
+<p className="mt-3 text-sm opacity-70">
+  Self-serve software product. No human consulting or done-for-you service included.
+</p>
 </div>
 
       </div>
