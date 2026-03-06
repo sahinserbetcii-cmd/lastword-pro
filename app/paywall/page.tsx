@@ -21,21 +21,16 @@ function PaywallContent() {
   const lang = normalizeLang(searchParams.get("lang"));
   const copy = paywallCopy[lang];
 
-  function handleUnlock() {
-  // ✅ Results sayfanın kontrol ettiği anahtar
-  localStorage.setItem("lastword:premium", "true");
-
-  // ✅ ResultsInner useEffect'in dinlediği event
-  window.dispatchEvent(new Event("lastword_premium_changed"));
-
-  // ✅ kullanıcıya bildirim
+ function handleUnlock() {
   localStorage.setItem(
-  "lastword:toast",
-  JSON.stringify({ type: "success", text: "Pro unlocked. Full results are now available." })
-);
+    "lastword:toast",
+    JSON.stringify({
+      type: "info",
+      text: "Payments are not live yet. Premium unlock will be enabled soon.",
+    })
+  );
 
-  // ✅ direkt sonuçlara dön (unlock etkisini görsün)
-  router.push("/results");
+  router.push("/");
 }
 
   function handleRestore() {
