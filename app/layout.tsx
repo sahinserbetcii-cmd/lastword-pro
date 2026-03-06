@@ -1,7 +1,7 @@
 import "./globals.css";
 import GlobalShell from "./components/GlobalShell";
 import type { Metadata } from "next";
-
+import SaaSFooter from "./components/SaaSFooter";
 
 export const metadata: Metadata = {
   title: {
@@ -66,7 +66,10 @@ export default function RootLayout({
       <body className="min-h-screen bg-[#0B1220] text-[#ededed] antialiased overscroll-none">
   <div className="min-h-screen w-full">
     <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 py-6">
-      <GlobalShell>{children}</GlobalShell>
+      <>
+  <GlobalShell>{children}</GlobalShell>
+  <SaaSFooter />
+</>
     </div>
   </div>
 </body>
