@@ -49,7 +49,7 @@ export async function POST(req: Request) {
     }
 
     const mode = body.mode ?? "professional";
-    const language = inferLanguageFromMessage(message);
+    const language = body.language ?? "en";
     const role = body.role ?? "sender";
     const recipientStyle = body.recipientStyle ?? "neutral";
     const tone = body.tone ?? "polite";

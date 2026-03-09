@@ -88,7 +88,7 @@ router.push("/results");
   const payload = {
     message: message.trim(),
     mode: "professional",
-    language: "tr",
+    language: "en",
     tone: style,
     recipientStyle: behavior,
     role,

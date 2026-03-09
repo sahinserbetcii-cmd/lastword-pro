@@ -85,8 +85,13 @@ function getPrimaryRiskLabel(score?: number | null) {
 function ResultsInner() {
 
   const router = useRouter();
-
   const searchParams = useSearchParams();
+  const [isPremium, setIsPremium] = useState(false);
+
+useEffect(() => {
+  const premium = localStorage.getItem("lastword:premium") === "true";
+  setIsPremium(premium);
+}, []);
 const locale = normalizeLang(searchParams.get("lang") ?? "en");
 const payloadRaw =
   typeof window !== "undefined"
