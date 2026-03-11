@@ -8,13 +8,19 @@ export default function SuccessPage() {
 
   useEffect(() => {
     try {
+      // PRO flag set
       localStorage.setItem("lastword:premium", "true");
-      window.dispatchEvent(new Event("lastword_premium_changed"));
-    } catch {}
 
+      // uygulamaya event gönder
+      window.dispatchEvent(new Event("lastword_premium_changed"));
+
+    } catch (e) {}
+
+    // analyze sayfasına yönlendir
     setTimeout(() => {
       router.replace("/analyze");
     }, 1200);
+
   }, [router]);
 
   return (
@@ -22,7 +28,7 @@ export default function SuccessPage() {
       <div className="text-center">
         <h1 className="text-4xl font-semibold">Payment Successful</h1>
         <p className="mt-4 text-white/70">
-          Your LastWord Pro access is now active. Redirecting to Analyze...
+          Your LastWord Pro access is now active.
         </p>
       </div>
     </main>
