@@ -24,7 +24,9 @@ export default function RefundPage() {
       <p style={{ marginBottom: 22, fontSize: 17 }}>
         Refunds are processed through Paddle in accordance with Paddle&apos;s refund policy.
       </p>
-
+<p style={{ marginBottom: 22, fontSize: 17 }}>
+No additional refund conditions or exceptions apply beyond Paddle's applicable refund handling requirements.
+</p>
       <h2 style={{ fontSize: 22, fontWeight: 600, marginTop: 30, marginBottom: 10 }}>
         Contact
       </h2>

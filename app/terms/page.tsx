@@ -29,7 +29,8 @@ export default function TermsPage() {
         <br />
         Trading Name: LastWord Pro
       </p>
-
+<br />
+This service is operated by Sahin Serbetci.
       <h2 style={{ fontSize: 22, fontWeight: 600, marginTop: 30, marginBottom: 10 }}>
         Nature of the Product
       </h2>
