@@ -30,17 +30,27 @@ function PaywallContent() {
   }
 
   paddle.Initialize({
-    token: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN
+    token: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN,
+    checkout: {
+      settings: {
+        displayMode: "overlay",
+        locale: "en",
+      },
+    },
   });
 
   paddle.Checkout.open({
     items: [
       {
-        priceId: "pri_01kkdshbt95vmw77sremdb83d3"
-      }
+        priceId: "pri_01kkdshbt95vmw77sremdb83d3",
+        quantity: 1,
+      },
     ],
-    successUrl: `${window.location.origin}/success`,
-    cancelUrl: `${window.location.origin}/cancel`
+    settings: {
+      displayMode: "overlay",
+      locale: "en",
+      successUrl: `${window.location.origin}/success`,
+    },
   });
 }
 
