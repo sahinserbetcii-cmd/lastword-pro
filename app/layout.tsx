@@ -2,7 +2,7 @@ import "./globals.css";
 import GlobalShell from "./components/GlobalShell";
 import type { Metadata } from "next";
 import SaaSFooter from "./components/SaaSFooter";
-
+import Script from "next/script";
 export const metadata: Metadata = {
   title: {
     default: "LastWord Pro | Professional Communication Risk Analysis",
@@ -64,6 +64,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-[#0B1220] text-[#ededed] antialiased overscroll-none">
+        <Script
+  src="https://cdn.paddle.com/paddle/v2/paddle.js"
+  strategy="beforeInteractive"
+/>
   <div className="min-h-screen w-full">
     <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 py-6">
       <>

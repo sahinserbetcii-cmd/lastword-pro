@@ -22,15 +22,26 @@ function PaywallContent() {
   const copy = paywallCopy[lang];
 
  function handleUnlock() {
-  localStorage.setItem(
-    "lastword:toast",
-    JSON.stringify({
-      type: "info",
-      text: "Payments are not live yet. Premium unlock will be enabled soon.",
-    })
-  );
+  const paddle = (window as any).Paddle;
 
-  router.push("/");
+  if (!paddle) {
+    alert("Payment system loading...");
+    return;
+  }
+
+  paddle.Initialize({
+    token: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN
+  });
+
+  paddle.Checkout.open({
+    items: [
+      {
+        priceId: "pri_01kkdshbt95vmw77sremdb83d3"
+      }
+    ],
+    successUrl: `${window.location.origin}/success`,
+    cancelUrl: `${window.location.origin}/cancel`
+  });
 }
 
   function handleRestore() {
