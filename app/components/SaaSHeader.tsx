@@ -3,6 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 type NavItem = {
   label: string;
   href: string; // anchor or route
@@ -44,6 +45,12 @@ const NAV: NavItem[] = [
   const [open, setOpen] = React.useState(false);
 const [activeId, setActiveId] = React.useState<string>("");
 const [scrolled, setScrolled] = React.useState(false);
+const [isPro, setIsPro] = React.useState(false);
+
+useEffect(() => {
+  const premium = localStorage.getItem("lastword:premium") === "true";
+  setIsPro(premium);
+}, []);
   React.useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setOpen(false);
@@ -195,12 +202,14 @@ const [scrolled, setScrolled] = React.useState(false);
         {/* Right side */}
         <div className="flex items-center gap-2">
           {/* Desktop CTA */}
-          <Link
-           href={locale ? `/paywall?lang=${locale}` : '/paywall'}
-            className="hidden md:inline-flex h-9 items-center justify-center rounded-lg bg-white px-4 text-sm font-semibold text-black hover:bg-white/90 transition-colors focus:outline-none focus:ring-2 focus:ring-white/30"
-          >
-             {l.unlockPro}
-          </Link>
+          {!isPro && (
+  <Link
+    href={locale ? `/paywall?lang=${locale}` : "/paywall"}
+    className="hidden md:inline-flex ..."
+  >
+    {l.unlockPro}
+  </Link>
+)}
 
           {/* Mobile menu button */}
           <button
@@ -239,13 +248,15 @@ const [scrolled, setScrolled] = React.useState(false);
                 {item.label}
               </a>
             ))}
-            <Link
-              href={locale ? `/paywall?lang=${locale}` : '/paywall'}
-              className="mt-1 inline-flex h-10 items-center justify-center rounded-lg bg-white px-4 text-sm font-semibold text-black hover:bg-white/90 transition-colors"
-              onClick={() => setOpen(false)}
-            >
-               {l.unlockPro}
-            </Link>
+            {!isPro && (
+  <Link
+    href={locale ? `/paywall?lang=${locale}` : "/paywall"}
+    className="mt-1 inline-flex ..."
+    onClick={() => setOpen(false)}
+  >
+    {l.unlockPro}
+  </Link>
+)}
           </div>
         </div>
       </div>

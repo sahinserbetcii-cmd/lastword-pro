@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 import { paywallCopy } from "../i18n/paywall";
 import { normalizeLang } from "../i18n/getLang";
 import { setLang } from "../i18n/getLang";
@@ -20,7 +20,13 @@ function PaywallContent() {
 
   const lang = normalizeLang(searchParams.get("lang"));
   const copy = paywallCopy[lang];
+React.useEffect(() => {
+  const premium = localStorage.getItem("lastword:premium") === "true";
 
+  if (premium) {
+    router.replace("/analyze");
+  }
+}, [router]);
  function handleUnlock() {
   const paddle = (window as any).Paddle;
 
